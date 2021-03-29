@@ -64,8 +64,8 @@ def build_simplenote(codesign:, archive_path: nil)
     # When exporting for the App Store, we need a .pkg file because that's the
     # only format upload_to_app_store supports.
     #
-    # Note for the future readers: this might need to be disabled for the
-    # developer-id export, see
+    # Note for the futures: this might need to be disabled for the developer-id
+    # export, see
     # https://github.com/fastlane/fastlane/issues/15963#issuecomment-593649185
     skip_package_pkg: false,
   )
