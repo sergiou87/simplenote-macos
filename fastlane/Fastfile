@@ -308,27 +308,27 @@ end
     # TestFlight does not suport macOS but we can use deliver to upload the
     # binary to the App Store by telling it to skip all the metadata,
     # screenshots, etc.
-    upload_to_app_store(
-      pkg: File.join(BUILD_FOLDER, 'Simplenote.pkg'),
-      skip_screenshots: true,
-      overwrite_screenshots: false,
-      skip_metadata: true,
-      skip_app_version_update: true,
-      run_precheck_before_submit: false,
-      precheck_include_in_app_purchases: false,
-      skip_binary_upload: false,
-      force: true, # Skip verification of HTML preview file
-    )
+    # upload_to_app_store(
+    #   pkg: File.join(BUILD_FOLDER, 'Simplenote.pkg'),
+    #   skip_screenshots: true,
+    #   overwrite_screenshots: false,
+    #   skip_metadata: true,
+    #   skip_app_version_update: true,
+    #   run_precheck_before_submit: false,
+    #   precheck_include_in_app_purchases: false,
+    #   skip_binary_upload: false,
+    #   force: true, # Skip verification of HTML preview file
+    # )
 
-    sentry_upload_dsym(
-      auth_token: get_required_env("SENTRY_AUTH_TOKEN"),
-      org_slug: 'a8c',
-      project_slug: 'simplenotemacos',
-      # At the time of writing, there's no way to explicitly configure the
-      # dSYM path, but build_mac_app sets it in the environment if successful.
-      # See `bundle exec fastlane action build_mac_app`.
-      dsym_path: ENV['DSYM_OUTPUT_PATH'],
-    )
+    # sentry_upload_dsym(
+    #   auth_token: get_required_env("SENTRY_AUTH_TOKEN"),
+    #   org_slug: 'a8c',
+    #   project_slug: 'simplenotemacos',
+    #   # At the time of writing, there's no way to explicitly configure the
+    #   # dSYM path, but build_mac_app sets it in the environment if successful.
+    #   # See `bundle exec fastlane action build_mac_app`.
+    #   dsym_path: ENV['DSYM_OUTPUT_PATH'],
+    # )
 
     # Do not create the GitHub release unless explicitly requested
     if options[:create_github_release]
