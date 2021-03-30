@@ -90,7 +90,9 @@ workflows:
   app_store:
     when: << pipeline.parameters.app_store_build >>
     jobs:
-      - Test
-      - App Store Upload:
-          requires:
-            - Test
+      # DEBUG – Faster feedback without tests
+      - App Store Upload
+      # - Test
+      # - App Store Upload:
+      #     requires:
+      #       - Test
