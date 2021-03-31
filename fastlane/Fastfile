@@ -235,36 +235,82 @@ end
   #####################################################################################
   desc "Builds and updates for beta distribution"
   lane :build_and_upload_beta do | options |
-    ensure_git_status_clean()
+    # ensure_git_status_clean()
 
-    configure_apply()
-    sh("rake dependencies:pod:clean")
-    cocoapods()
+    # configure_apply()
+    # sh("rake dependencies:pod:clean")
+    # cocoapods()
 
-    build_app(
+    bundle_id = "com.automattic.SimplenoteMac.beta"
+
+    sync_code_signing(
+      type: "developer_id",
+      platform: "macos",
+      # This Mac app also needs a Mac Installer Distribution certificate
+      additional_cert_types: ['mac_installer_distribution'],
+      # Will default to false, unless a readonly value is specified, or is
+      # running on CI, in which case it will always true.
+      readonly: options[:readonly] || is_ci,
+      app_identifier: bundle_id,
+    )
+
+    output_directory = BUILD_FOLDER
+    app_file_name = "Simplenote.app"
+
+    # Try to codesign Sparkle outside of the build process, like we do in
+    # AutoProxxy
+    system %Q{
+export BUILT_PRODUCTS_DIR=DerivedData/Simplenote/Build/Intermediates.noindex/ArchiveIntermediates/Simplenote/BuildProductsPath/Release/Simplenote.app
+export FRAMEWORKS_FOLDER_PATH=Contents/Frameworks
+export CONFIGURATION=Release
+export SRCROOT='.'
+
+./Scripts/Build-Phases/sparkle-code-sign.sh
+}
+
+    build_mac_app(
       workspace: WORKSPACE,
       scheme: INTERNAL_SCHEME,
       clean: true,
-      output_directory: BUILD_FOLDER
+      # It might not be necessary to use this, just trying to mimic a setup I
+      # know works
+      configuration: 'Release',
+      # We're distributing internally, so we need to explicity specify the method
+      # as the "Developer Id" one we'd manually pick in the Xcode Organizer
+      # distribution UI.
+      export_method: "developer-id",
+      # Required to export in "developer-id" mode.
+      # See https://github.com/fastlane/fastlane/issues/15963
+      skip_package_pkg: true,
+      output_directory: output_directory,
+      archive_path: File.join(output_directory, 'Simplenote')
     )
 
-    appcenter_upload(
-      api_token: get_required_env("APPCENTER_API_TOKEN"),
-      owner_name: "automattic",
-      owner_type: "organization",
-      app_name: "Simplenote-OSX",
-      ipa: "./build/Simplenote.app",
-      notify_testers: false
+    notarize(
+      package: File.join(output_directory, app_file_name),
+      bundle_id: bundle_id,
+      asc_provider: "AutomatticInc",
+      print_log: options[:print_log] || is_ci,
+      verbose: options[:verbose] || is_ci,
     )
 
-    dSYM_PATH = File.dirname(Dir.pwd) + "/build/Simplenote.app.dSYM.zip"
+    # appcenter_upload(
+    #   api_token: get_required_env("APPCENTER_API_TOKEN"),
+    #   owner_name: "automattic",
+    #   owner_type: "organization",
+    #   app_name: "Simplenote-OSX",
+    #   ipa: "./build/Simplenote.app",
+    #   notify_testers: false
+    # )
 
-    sentry_upload_dsym(
-      auth_token: get_required_env("SENTRY_AUTH_TOKEN"),
-      org_slug: 'a8c',
-      project_slug: 'simplenote-macos',
-      dsym_path: dSYM_PATH,
-    )
+    # dsym_path = File.dirname(Dir.pwd) + "/build/Simplenote.app.dSYM.zip"
+
+    # sentry_upload_dsym(
+    #   auth_token: get_required_env("SENTRY_AUTH_TOKEN"),
+    #   org_slug: 'a8c',
+    #   project_slug: 'simplenote-macos',
+    #   dsym_path: dsym_path,
+    # )
   end
 
   #############################################################################
