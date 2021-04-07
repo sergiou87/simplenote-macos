@@ -257,17 +257,6 @@ end
     output_directory = BUILD_FOLDER
     app_file_name = "Simplenote.app"
 
-    # Try to codesign Sparkle outside of the build process, like we do in
-    # AutoProxxy
-    system %Q{
-export BUILT_PRODUCTS_DIR=DerivedData/Simplenote/Build/Intermediates.noindex/ArchiveIntermediates/Simplenote/BuildProductsPath/Release/Simplenote.app
-export FRAMEWORKS_FOLDER_PATH=Contents/Frameworks
-export CONFIGURATION=Release
-export SRCROOT='.'
-
-./Scripts/Build-Phases/sparkle-code-sign.sh
-}
-
     build_mac_app(
       workspace: WORKSPACE,
       scheme: INTERNAL_SCHEME,
