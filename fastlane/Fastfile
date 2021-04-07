@@ -278,6 +278,11 @@ export SRCROOT='.'
       # We're distributing internally, so we need to explicity specify the method
       # as the "Developer Id" one we'd manually pick in the Xcode Organizer
       # distribution UI.
+      #
+      # Note that this alone is not enough. For the build and archive to
+      # succeed, we need the CODE_SIGN_IDENTITY value to be "Develorper ID
+      # Application". This is set in the Xcode project, although we could have
+      # used the xcargs parameter to set it here instead.
       export_method: "developer-id",
       # Required to export in "developer-id" mode.
       # See https://github.com/fastlane/fastlane/issues/15963
