@@ -298,7 +298,7 @@ end
       package: app_file_path,
       bundle_id: bundle_id,
       asc_provider: "AutomatticInc",
-      api_key_path: ENV['APP_STORE_CONNECT_API_KEY_PATH'],
+      api_key_path: get_required_env('APP_STORE_CONNECT_API_KEY_PATH'),
       print_log: options[:print_log] || is_ci,
       verbose: options[:verbose] || is_ci,
     )
