@@ -241,11 +241,11 @@ end
   #####################################################################################
   desc "Builds and updates for beta distribution"
   lane :build_and_upload_beta do | options |
-    # ensure_git_status_clean()
+    ensure_git_status_clean()
 
-    # configure_apply()
-    # sh("rake dependencies:pod:clean")
-    # cocoapods()
+    configure_apply()
+    sh("rake dependencies:pod:clean")
+    cocoapods()
 
     bundle_id = "com.automattic.SimplenoteMac.beta"
 
@@ -295,23 +295,23 @@ end
       verbose: options[:verbose] || is_ci,
     )
 
-    # appcenter_upload(
-    #   api_token: get_required_env("APPCENTER_API_TOKEN"),
-    #   owner_name: "automattic",
-    #   owner_type: "organization",
-    #   app_name: "Simplenote-OSX",
-    #   ipa: "./build/Simplenote.app",
-    #   notify_testers: false
-    # )
+    appcenter_upload(
+      api_token: get_required_env("APPCENTER_API_TOKEN"),
+      owner_name: "automattic",
+      owner_type: "organization",
+      app_name: "Simplenote-OSX",
+      ipa: "./build/Simplenote.app",
+      notify_testers: false
+    )
 
-    # dsym_path = File.dirname(Dir.pwd) + "/build/Simplenote.app.dSYM.zip"
+    dsym_path = File.dirname(Dir.pwd) + "/build/Simplenote.app.dSYM.zip"
 
-    # sentry_upload_dsym(
-    #   auth_token: get_required_env("SENTRY_AUTH_TOKEN"),
-    #   org_slug: 'a8c',
-    #   project_slug: 'simplenote-macos',
-    #   dsym_path: dsym_path,
-    # )
+    sentry_upload_dsym(
+      auth_token: get_required_env("SENTRY_AUTH_TOKEN"),
+      org_slug: 'a8c',
+      project_slug: 'simplenote-macos',
+      dsym_path: dsym_path,
+    )
   end
 
   #############################################################################
