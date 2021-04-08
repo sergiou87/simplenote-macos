@@ -286,8 +286,10 @@ end
       archive_path: File.join(output_directory, 'Simplenote')
     )
 
+    app_file_path = File.join(output_directory, app_file_name)
+
     notarize(
-      package: File.join(output_directory, app_file_name),
+      package: app_file_path,
       bundle_id: bundle_id,
       asc_provider: "AutomatticInc",
       api_key_path: ENV['APP_STORE_CONNECT_API_KEY_PATH'],
@@ -295,22 +297,26 @@ end
       verbose: options[:verbose] || is_ci,
     )
 
-    appcenter_upload(
-      api_token: get_required_env("APPCENTER_API_TOKEN"),
-      owner_name: "automattic",
-      owner_type: "organization",
-      app_name: "Simplenote-OSX",
-      ipa: "./build/Simplenote.app",
-      notify_testers: false
-    )
+    Tempfile.create do |t|
+      release_notes_path = File.path(t)
+      system "pushd ..; ruby ./Scripts/extract_release_notes.rb -k > #{release_notes_path}; popd"
 
-    dsym_path = File.dirname(Dir.pwd) + "/build/Simplenote.app.dSYM.zip"
+      appcenter_upload(
+        api_token: get_required_env("APPCENTER_API_TOKEN"),
+        owner_name: "automattic",
+        owner_type: "organization",
+        app_name: "Simplenote-OSX",
+        ipa: app_file_path,
+        release_notes: File.read(release_notes_path),
+        notify_testers: false
+      )
+    end
 
     sentry_upload_dsym(
       auth_token: get_required_env("SENTRY_AUTH_TOKEN"),
       org_slug: 'a8c',
       project_slug: 'simplenote-macos',
-      dsym_path: dsym_path,
+      dsym_path: File.join(output_directory, 'Simplenote.app.dSYM.zip'),
     )
   end
 
