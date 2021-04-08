@@ -91,6 +91,9 @@ jobs:
       - setup_environment
       - decrypt_secrets
       - run:
+          name: Install Sentry CLI
+          command: brew install getsentry/tools/sentry-cli
+      - run:
           name: Build and Upload Beta to App Center
           # Extra no output timeout in case notarization doesn't respond for a
           # while. This is probably overkill because the notarize Fastlane
