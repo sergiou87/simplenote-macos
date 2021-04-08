@@ -82,6 +82,20 @@ jobs:
           command: |
             bundle exec fastlane build_and_upload_app_store create_github_release:true
 
+  Beta Upload:
+    executor: *xcode_image
+    steps:
+      - setup_environment
+      - decrypt_secrets
+      - run:
+          name: Build and Upload Beta to App Center
+          # Extra no output timeout in case notarization doesn't respond for a
+          # while. This is probably overkill because the notarize Fastlane
+          # actions pings it every minute or so, but it doesn't hurt either.
+          no_output_timeout: 30m
+          command: |
+            bundle exec fastlane build_and_upload_beta
+
 workflows:
   simplenote_macos:
     when:
